@@ -1,0 +1,5 @@
+{
+    "enableJsonBackup": false,
+    "jsonBackupIntervalMs": 1000,
+    "sqliteFlushIntervalMs": 500
+}

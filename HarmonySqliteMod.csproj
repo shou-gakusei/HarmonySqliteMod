@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<RootNamespace>HarmonySqliteMod</RootNamespace>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<OutputType>Library</OutputType>
+		<Version>0.0.1</Version>
+		<!-- Output to spt-server SPT/user/mods/HarmonySqliteMod directory -->
+		<OutputPath>..\spt-server\SPT\user\mods\HarmonySqliteMod\</OutputPath>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<!-- Copy NuGet dependency DLLs to output -->
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SPTarkov.Common" Version="4.0.13" />
+		<PackageReference Include="SPTarkov.DI" Version="4.0.13" />
+		<PackageReference Include="SPTarkov.Server.Core" Version="4.0.13" />
+		<PackageReference Include="SPTarkov.Reflection" Version="4.0.13" />
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0" />
+		<PackageReference Include="Dapper" Version="2.1.35" />
+	</ItemGroup>
+
+	<!-- Post-build: Move dependency DLLs to ./dependencies/ for clean packaging -->
+	<Target Name="MoveDependencies" AfterTargets="Build">
+		<ItemGroup>
+			<!-- All DLLs except the mod's own and runtime native stubs -->
+			<DepFiles Include="$(OutputPath)*.dll" Exclude="$(OutputPath)$(AssemblyName).dll" />
+			<DepFiles Include="$(OutputPath)*.pdb" Exclude="$(OutputPath)$(AssemblyName).pdb" />
+			<DepFiles Include="$(OutputPath)*.xml" />
+			<!-- Move JSON dependency files but exclude the mod's own config.json -->
+			<DepFiles Include="$(OutputPath)*.json" Exclude="$(OutputPath)config.json" />
+		</ItemGroup>
+		<MakeDir Directories="$(OutputPath)dependencies" />
+		<Move SourceFiles="@(DepFiles)" DestinationFolder="$(OutputPath)dependencies" Condition="Exists('%(FullPath)')" />
+	</Target>
+
+</Project>
